@@ -5,6 +5,12 @@ import java.time.LocalDate;
 
 @Table(name = "F1_RACE")
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "Race.findRaceById",
+                query = "select r from Race r where r.id = :ID"
+        )
+})
 public class Race {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
