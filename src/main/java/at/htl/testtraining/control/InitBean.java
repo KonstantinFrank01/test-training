@@ -1,11 +1,22 @@
 package at.htl.testtraining.control;
 
+import at.htl.testtraining.entity.Race;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.stream.Stream;
 
 @Transactional
 public class InitBean {
@@ -22,11 +33,27 @@ public class InitBean {
     }
 
     private void readRacesFromFile(String file) {
-
+        URL url = Thread.currentThread().getContextClassLoader().getResource(RACES_FILE);
+        try (Stream<String> stream = Files.lines(Paths.get(url.getPath()), StandardCharsets.UTF_8)) {
+            stream.skip(1)
+                    .map(s -> s.split(";"))
+                    .forEach(this::persistRaces);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     void persistRaces(String[] line) {
-
+        try {
+            Race race = null;
+            race = em.createNamedQuery("Race.findRaceById", Race.class)
+                    .setParameter("ID", Long.valueOf(line[0]))
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            Race raceP = new Race(line[1], LocalDate.parse(line[2], formatter));
+            em.persist(raceP);
+        }
     }
 
     private void readTeamsAndDriversFromFile(String file) {
