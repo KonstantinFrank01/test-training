@@ -1,12 +1,15 @@
 package at.htl.testtraining.control;
 
+import at.htl.testtraining.boundary.ResultRestClient;
 import at.htl.testtraining.entity.Driver;
 import at.htl.testtraining.entity.Race;
+import at.htl.testtraining.entity.Result;
 import at.htl.testtraining.entity.Team;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -29,9 +32,13 @@ public class InitBean {
     @PersistenceContext
     EntityManager em;
 
+    @Inject
+    ResultRestClient client;
+
     public void init(@Observes @Initialized(ApplicationScoped.class) Object init) {
         readRacesFromFile(RACES_FILE);
         readTeamsAndDriversFromFile(TEAMS_DRIVERS_FILE);
+        client.readResultsFromEndpoint();
     }
 
     private void readRacesFromFile(String file) {
