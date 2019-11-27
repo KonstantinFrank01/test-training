@@ -37,7 +37,7 @@ public class ResultRestClient {
                     .setParameter("NAME", result.getString("driverFullName"))
                     .getSingleResult();
             Race race = em.createNamedQuery("Race.findRaceById", Race.class)
-                    .setParameter("ID", result.getInt("raceNo"))
+                    .setParameter("ID", Long.valueOf(result.getInt("raceNo")))
                     .getSingleResult();
             em.persist(new Result(race, result.getInt("position"), driver));
         }
