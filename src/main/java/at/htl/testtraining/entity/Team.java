@@ -4,6 +4,12 @@ import javax.persistence.*;
 
 @Table(name = "F1_TEAM")
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "Team.findTeamByName",
+                query = "select t from Team t where t.name = :NAME"
+        )
+})
 public class Team {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
